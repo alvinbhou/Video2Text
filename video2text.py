@@ -19,6 +19,7 @@ def parse():
     parser.add_argument('--learning_rate', type=float, default=0.0007, help='learning rate for training')
     parser.add_argument('--batch_size', type=int, default=320, help='batch size for training')
     parser.add_argument('--epoch', type=int, default=100, help='epochs for training')
+    parser.add_argument('--test', action='store_true', help='use this flag for testing')
     try:
         from argument import add_arguments
         parser = add_arguments(parser)
@@ -36,6 +37,7 @@ class Video2Text(object):
         self.batch_size = args.batch_size
         self.lr = args.learning_rate
         self.epochs = args.epoch
+        self.trainable = not args.test
         self.latent_dim = 512
         self.num_encoder_tokens = 4096
         self.num_decoder_tokens = 1500
@@ -43,7 +45,6 @@ class Video2Text(object):
         self.time_steps_decoder = None
         self.preload = True
         self.preload_data_path = 'preload_data'
-        self.trainable = False
         self.max_propablity = -1
 
         # processed data
@@ -129,6 +130,10 @@ class Video2Text(object):
         return [self.encoder_input_data, self.decoder_input_data], self.decoder_target_data, self.tokenizer
 
     def load_inference_models(self):
+        # load tokenizer
+        with open(os.path.join(self.save_model_path, 'tokenizer' + str(self.num_decoder_tokens)), 'rb') as file:
+            self.tokenizer = joblib.load(file)
+
         # inference encoder model
         self.inf_encoder_model = load_model(os.path.join(self.save_model_path, 'encoder_model.h5'))
 
@@ -307,8 +312,8 @@ class Video2Text(object):
                 
 if __name__ == "__main__":
     vid2Text = Video2Text(parse())
-    vid2Text.load_data()
     if(vid2Text.trainable):
+        vid2Text.load_data()
         vid2Text.train()
     vid2Text.load_inference_models()
     vid2Text.test()

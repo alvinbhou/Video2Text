@@ -63,7 +63,7 @@ For testing, you should use the `--test` flag, and here is a sample script to ge
 python video2text.py --uid best --test
 ```
 
-This generates the video-to-text output at [test_ouput.txt](models/best/test_output.txt), and the average bleu score is 0.295552708.
+This generates the video-to-text output at [test_ouput.txt](models/best/test_output.txt), and the average bleu score is 0.69009423.
 
 For more information, check out the [report](report.pdf).
 
